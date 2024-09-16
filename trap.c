@@ -123,7 +123,7 @@ void interrupt_handler(struct trapframe *tf) {
                 ticks = 0;  
                 count++;  
                 if (count == 10) { 
-                    shut_down(); 
+                    sbi_shutdown(); 
                 }
             }
             break;
