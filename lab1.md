@@ -8,6 +8,7 @@
 ##练习1: 使用GDB验证启动流程
 
 为了熟悉使用qemu和gdb进行调试工作,使用gdb调试QEMU模拟的RISC-V计算机加电开始运行到执行应用程序的第一条指令（即跳转到0x80200000）这个阶段的执行过程，说明RISC-V硬件加电后的几条指令在哪里？完成了哪些功能？要求在报告中简要写出练习过程和回答。
+
 Lab0.5运行结果截图：
 
 ![屏幕截图 2024-09-16 184210](https://github.com/user-attachments/assets/9b5f74d7-9db9-40ab-b49f-04faadcd42eb)
@@ -57,6 +58,7 @@ csrr a0, mhartid：mhartid是RISC-V的机器级CSR寄存器，用于存储当前
 ![屏幕截图 2024-09-16 193943](https://github.com/user-attachments/assets/2a782d65-c5ab-41e7-9eeb-73389a61cc71)
 
 至此完成了Lab0.5的GDB调试任务
+
 ![屏幕截图 2024-09-16 193955](https://github.com/user-attachments/assets/6835c6e4-4dec-4ff7-869b-89531309d689)
 
 
