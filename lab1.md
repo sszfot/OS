@@ -9,28 +9,48 @@
 
 为了熟悉使用qemu和gdb进行调试工作,使用gdb调试QEMU模拟的RISC-V计算机加电开始运行到执行应用程序的第一条指令（即跳转到0x80200000）这个阶段的执行过程，说明RISC-V硬件加电后的几条指令在哪里？完成了哪些功能？要求在报告中简要写出练习过程和回答。
 Lab0.5运行结果截图：
+
 ![屏幕截图 2024-09-16 184210](https://github.com/user-attachments/assets/9b5f74d7-9db9-40ab-b49f-04faadcd42eb)
 
 
 ![屏幕截图 2024-09-16 184513](https://github.com/user-attachments/assets/8e4a6471-4363-49ca-b309-e2e99918c31e)
+
 加电后执行的指令：
+
 ![屏幕截图 2024-09-16 184625](https://github.com/user-attachments/assets/684570bd-f310-42d6-9e6f-930abeb85acf)
+
 0x1000:auipc t0 , 0x0:将当前程序计数器PC中保存的值与0x0相加，并将结果保存在寄存器t0中
+
 ![屏幕截图 2024-09-16 185738](https://github.com/user-attachments/assets/42f46ebb-fadd-41ac-948b-be54282314bc)
+
 执行后可以看到t0寄存器的值被设置为0x1000
+
 0x1004: addi a1, t0, 32：将寄存器t0中的值与立即数32相加，并将结果存储在寄存器a1中。
+
 ![屏幕截图 2024-09-16 190020](https://github.com/user-attachments/assets/d0d0844a-2e07-420e-928d-b3c0aa441171)
+
 执行后a1寄存器的值被设置为0x1020
+
 csrr a0, mhartid：mhartid是RISC-V的机器级CSR寄存器，用于存储当前硬件线程ID，本条指令用于从mhartid中读取硬件线程ID并将结果保存在a0寄存器中
+
 ![屏幕截图 2024-09-16 190020](https://github.com/user-attachments/assets/4139c333-2c2a-4d02-860a-ba5deb2ab9dc)
+
 执行结果如上
+
 0x100c: ld t0, 24(t0)：用于从存储器中加载一个64位的值存储在寄存器t0中，目标地址为当前t0寄存器中的值加上偏移量24
+
 ![屏幕截图 2024-09-16 191231](https://github.com/user-attachments/assets/dc4fc7c5-2118-4930-b97b-04e9976a1621)
+
 0x1010: jr t0：无条件跳转到寄存器t0中存储的地址处，即跳转到0x80000000处。
+
 再执行指令前先查看0x80000000处的指令：
+
 ![屏幕截图 2024-09-16 191557](https://github.com/user-attachments/assets/cc32f9f5-34b3-4371-8a62-d77c755d6fe2)
+
 单步调试并查看即将执行的指令：
+
 ![屏幕截图 2024-09-16 191710](https://github.com/user-attachments/assets/a3831269-4a12-40e8-affe-734e98d93e81)
+
 可以发现程序正确跳转到了0x80000000处，并即将执行接下来的指令。
 
 
