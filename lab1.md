@@ -12,6 +12,7 @@ Lab0.5运行结果截图：
 
 ![屏幕截图 2024-09-16 184210](https://github.com/user-attachments/assets/9b5f74d7-9db9-40ab-b49f-04faadcd42eb)
 
+使用GDB进行调试
 
 ![屏幕截图 2024-09-16 184513](https://github.com/user-attachments/assets/8e4a6471-4363-49ca-b309-e2e99918c31e)
 
@@ -51,7 +52,15 @@ csrr a0, mhartid：mhartid是RISC-V的机器级CSR寄存器，用于存储当前
 
 ![屏幕截图 2024-09-16 191710](https://github.com/user-attachments/assets/a3831269-4a12-40e8-affe-734e98d93e81)
 
-可以发现程序正确跳转到了0x80000000处，并即将执行接下来的指令。
+可以发现程序正确跳转到了0x80000000处，并即将执行接下来的指令。在QEMU模拟的riscv计算机中，在Qemu开始执行指令之前，作为 bootloader 的 OpenSBI.bin 被加载到物理内存以物理地址 0x80000000 开头的区域上，同时内核镜像 os.bin 被加载到以物理地址 0x80200000 开头的区域上，故内核的第一条指令应位于物理地址 0x80200000 处，为此在0x80200000处打断点并执行。
+
+![屏幕截图 2024-09-16 193943](https://github.com/user-attachments/assets/2a782d65-c5ab-41e7-9eeb-73389a61cc71)
+
+至此完成了Lab0.5的GDB调试任务
+![屏幕截图 2024-09-16 193955](https://github.com/user-attachments/assets/6835c6e4-4dec-4ff7-869b-89531309d689)
+
+
+
 
 
 
