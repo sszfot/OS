@@ -89,9 +89,36 @@ tail伪指令是RISC-V中的尾调用优化指令，用于无条件跳转到一�
 请编程完善trap.c中的中断处理函数trap，在对时钟中断进行处理的部分填写kern/trap/trap.c函数中处理时钟中断的部分，使操作系统每遇到100次时钟中断后，调用print_ticks子程序，向屏幕上打印一行文字”100 ticks”，在打印完10行后调用sbi.h中的shut_down()函数关机。
 
 要求完成问题1提出的相关函数实现，提交改进后的源代码包（可以编译执行），并在实验报告中简要说明实现过程和定时器中断中断处理的流程。实现要求的部分代码后，运行整个系统，大约每1秒会输出一次”100 ticks”，输出10行。
+
 ###思路
+
     
 ###代码
+    case IRQ_S_TIMER:
+            // "All bits besides SSIP and USIP in the sip register are
+            // read-only." -- privileged spec1.9.1, 4.1.4, p59
+            // In fact, Call sbi_set_timer will clear STIP, or you can clear it
+            // directly.
+            // cprintf("Supervisor timer interrupt\n");
+             /* LAB1 EXERCISE2   YOUR CODE :  2210585 2210587 */
+            /*(1)设置下次时钟中断- clock_set_next_event()
+             *(2)计数器（ticks）加一
+             *(3)当计数器加到100的时候，我们会输出一个`100ticks`表示我们触发了100次时钟中断，同时打印次数（num）加一
+            * (4)判断打印次数，当打印次数为10时，调用<sbi.h>中的关机函数关机
+            */
+             clock_set_next_event();  
+            
+            ticks++; 
+            if (ticks == TICK_NUM) {
+                print_ticks();  
+                ticks = 0;  
+                count++;  
+                if (count == 10) { 
+                    sbi_shutdown();
+                }
+            }
+            break;
+
 
 ###结果截图
 
