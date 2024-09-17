@@ -205,7 +205,7 @@ trap.c
 
 init.c
 
-          int kern_init(void) {
+    int kern_init(void) {
     extern char edata[], end[];
     memset(edata, 0, end - edata);
 
@@ -225,11 +225,11 @@ init.c
 
     intr_enable();  // enable irq interrupt
 
-    asm("ebreak");//断点异常
+    asm("ebreak");//使用RISC-V 中的断点指令触发断点异常
     asm volatile(".word 0xFFFFFFFF");  // 插入无效指令，触发非法指令异常
     
     
 
     while (1)
         ;
-}
+    }
