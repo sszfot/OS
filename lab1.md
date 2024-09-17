@@ -107,7 +107,7 @@ tail伪指令是RISC-V中的尾调用优化指令，用于无条件跳转到一�
              *(3)当计数器加到100的时候，我们会输出一个`100ticks`表示我们触发了100次时钟中断，同时打印次数（num）加一
             * (4)判断打印次数，当打印次数为10时，调用<sbi.h>中的关机函数关机
             */
-             clock_set_next_event();  
+            clock_set_next_event();  
             
             ticks++; 
             if (ticks == TICK_NUM) {
@@ -180,7 +180,7 @@ trap.c
 
 	case CAUSE_ILLEGAL_INSTRUCTION:
              // 非法指令异常处理
-             /* LAB1 CHALLENGE3   YOUR CODE :  */
+             /* LAB1 CHALLENGE3   YOUR CODE :2210585 2210587  */
             /*(1)输出指令异常类型（ Illegal instruction）
              *(2)输出异常指令地址
              *(3)更新 tf->epc寄存器
@@ -192,7 +192,7 @@ trap.c
             break;
         case CAUSE_BREAKPOINT:
             //断点异常处理
-            /* LAB1 CHALLLENGE3   YOUR CODE :  */
+            /* LAB1 CHALLLENGE3   YOUR CODE :2210585 2210587  */
             /*(1)输出指令异常类型（ breakpoint）
              *(2)输出异常指令地址
              *(3)更新 tf->epc寄存器
