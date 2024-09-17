@@ -179,27 +179,27 @@ scause：表示导致中断或异常的原因，stval：保存了与异常相关
 trap.c
 
 	case CAUSE_ILLEGAL_INSTRUCTION:
-	    // 非法指令异常处理
-	    /* LAB1 CHALLENGE3   YOUR CODE :  */
-	    /*(1)输出指令异常类型（ Illegal instruction）
-	      *(2)输出异常指令地址
-	      *(3)更新 tf->epc寄存器
-	    */
+             // 非法指令异常处理
+             /* LAB1 CHALLENGE3   YOUR CODE :  */
+            /*(1)输出指令异常类型（ Illegal instruction）
+             *(2)输出异常指令地址
+             *(3)更新 tf->epc寄存器
+            */
             cprintf("Illegal instruction caught at: 0x%08x\n", tf->epc);
-	    cprintf("Exception type:Illegal instruction\n");       
-            // 更新epc寄存器，跳过导致异常的指令
-            tf->epc += 4; 
-	    break;
-	case CAUSE_BREAKPOINT:
-	    //断点异常处理
-	    /* LAB1 CHALLLENGE3   YOUR CODE :  */
-	    /*(1)输出指令异常类型（ breakpoint）
-	      *(2)输出异常指令地址
-	      *(3)更新 tf->epc寄存器
-	    */
-     	    cprintf("Illegal instruction caught at: 0x%08x\n", tf->epc);
 	    cprintf("Exception type:Illegal instruction\n");
             // 更新epc寄存器，跳过导致异常的指令
+            tf->epc += 4; 
+            break;
+        case CAUSE_BREAKPOINT:
+            //断点异常处理
+            /* LAB1 CHALLLENGE3   YOUR CODE :  */
+            /*(1)输出指令异常类型（ breakpoint）
+             *(2)输出异常指令地址
+             *(3)更新 tf->epc寄存器
+            */
+            cprintf("ebreak caught at: 0x%08x\n", tf->epc);
+            cprintf("Exception type: breakpoint\n");
+            // 更新epc寄存器，跳过断点指令
             tf->epc += 2; 
 	    break;
 
