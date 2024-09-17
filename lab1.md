@@ -132,11 +132,11 @@ stval和scause寄存器通常用于传递有关异常或中断的信息，异常
 
 ##扩展练习Challenge3：完善异常中断
 
-编程完善在触发一条非法指令异常 mret和，在 kern/trap/trap.c的异常处理函数中捕获，并对其进行处理，简单输出异常类型和异常指令触发地址，即“Illegal instruction caught at 0x(地址)”，“ebreak caught at 0x（地址）”与“Exception type:Illegal instruction"，“Exception type: breakpoint”。
+编程完善在触发一条非法指令异常 mret和，在 kern/trap/trap.c的异常处理函数中捕获，并对其进行处理，简单输出异常类型和异常指令触发地址，即“Illegal instruction caught at 0x(地址)”，“Breakpoint caught at 0x（地址）”与“Exception type:Illegal instruction"，“Exception type: Breakpoint”。
 
 	case CAUSE_ILLEGAL_INSTRUCTION:
 	    // 非法指令异常处理
-	    /* LAB1 CHALLENGE3   YOUR CODE :2111033 2113826 2113831  */
+	    /* LAB1 CHALLENGE3   YOUR CODE :  */
 	    /*(1)输出指令异常类型（ Illegal instruction）
 	      *(2)输出异常指令地址
 	      *(3)更新 tf->epc寄存器
@@ -147,13 +147,13 @@ stval和scause寄存器通常用于传递有关异常或中断的信息，异常
 	    break;
 	case CAUSE_BREAKPOINT:
 	    //断点异常处理
-	    /* LAB1 CHALLLENGE3   YOUR CODE :2111033 2113826 2113831  */
+	    /* LAB1 CHALLLENGE3   YOUR CODE :  */
 	    /*(1)输出指令异常类型（ breakpoint）
 	      *(2)输出异常指令地址
 	      *(3)更新 tf->epc寄存器
 	    */
-	    cprintf("ebreak caught at 0x%08x\n",tf->epc);
-	    cprintf("Exception type:breakpoint\n");
+	    cprintf("Breakpoint caught at 0x%08x\n",tf->epc);
+	    cprintf("Exception type:Breakpoint\n");
 	    tf->epc += 4;
 	    break;
 
