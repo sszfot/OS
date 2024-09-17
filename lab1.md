@@ -200,7 +200,7 @@ trap.c
      	    cprintf("Illegal instruction caught at: 0x%08x\n", tf->epc);
 	    cprintf("Exception type:Illegal instruction\n");
             // 更新epc寄存器，跳过导致异常的指令
-            tf->epc += 4; 
+            tf->epc += 2; 
 	    break;
 
 init.c
@@ -233,3 +233,9 @@ init.c
     while (1)
         ;
     }
+
+
+执行结果截图：
+
+![屏幕截图 2024-09-17 104859](https://github.com/user-attachments/assets/c8c2f039-95d7-401b-b1b7-404221938163)
+
