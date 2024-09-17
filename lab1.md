@@ -176,6 +176,8 @@ scause：表示导致中断或异常的原因，stval：保存了与异常相关
 
 编程完善在触发一条非法指令异常 mret和，在 kern/trap/trap.c的异常处理函数中捕获，并对其进行处理，简单输出异常类型和异常指令触发地址，即“Illegal instruction caught at 0x(地址)”，“Breakpoint caught at 0x（地址）”与“Exception type:Illegal instruction"，“Exception type: Breakpoint”。
 
+trap.c
+
 	case CAUSE_ILLEGAL_INSTRUCTION:
 	    // 非法指令异常处理
 	    /* LAB1 CHALLENGE3   YOUR CODE :  */
@@ -183,9 +185,10 @@ scause：表示导致中断或异常的原因，stval：保存了与异常相关
 	      *(2)输出异常指令地址
 	      *(3)更新 tf->epc寄存器
 	    */
-	    cprintf("Illegal instruction caught at 0x%08x\n",tf->epc);
-	    cprintf("Exception type:Illegal instruction\n");
-	    tf->epc += 4;
+            cprintf("Illegal instruction caught at: 0x%08x\n", tf->epc);
+	    cprintf("Exception type:Illegal instruction\n");       
+            // 更新epc寄存器，跳过导致异常的指令
+            tf->epc += 4; 
 	    break;
 	case CAUSE_BREAKPOINT:
 	    //断点异常处理
@@ -194,9 +197,39 @@ scause：表示导致中断或异常的原因，stval：保存了与异常相关
 	      *(2)输出异常指令地址
 	      *(3)更新 tf->epc寄存器
 	    */
-	    cprintf("Breakpoint caught at 0x%08x\n",tf->epc);
-	    cprintf("Exception type:breakpoint\n");
-	    tf->epc += 4;
+     	    cprintf("Illegal instruction caught at: 0x%08x\n", tf->epc);
+	    cprintf("Exception type:Illegal instruction\n");
+            // 更新epc寄存器，跳过导致异常的指令
+            tf->epc += 4; 
 	    break;
 
+init.c
 
+          int kern_init(void) {
+    extern char edata[], end[];
+    memset(edata, 0, end - edata);
+
+    cons_init();  // init the console
+
+    const char *message = "(THU.CST) os is loading ...\n";
+    cprintf("%s\n\n", message);
+
+    print_kerninfo();
+
+    // grade_backtrace();
+
+    idt_init();  // init interrupt descriptor table
+
+    // rdtime in mbare mode crashes
+    clock_init();  // init clock interrupt
+
+    intr_enable();  // enable irq interrupt
+
+    asm("ebreak");//断点异常
+    asm volatile(".word 0xFFFFFFFF");  // 插入无效指令，触发非法指令异常
+    
+    
+
+    while (1)
+        ;
+}
