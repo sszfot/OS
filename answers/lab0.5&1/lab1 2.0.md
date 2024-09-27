@@ -250,7 +250,7 @@ init.c
 
     asm("ebreak");//使用RISC-V 中的断点指令触发断点异常
     asm volatile(".word 0xFFFFFFFF");  // 插入无效指令，触发非法指令异常
-    
+    //asm("mret");
     
 
     while (1)
