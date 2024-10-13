@@ -57,9 +57,13 @@ kern/mm/default_pmm.c中的相关代码，认真分析default_init，default_ini
 3.如果没有找到合适的块，则返回 NULL。
 
 实现结果：
+
 make qemu：
+
 ![屏幕截图 2024-10-13 143124](https://github.com/user-attachments/assets/b158ac5c-54ba-44aa-8e6e-f356c8dbcb53)
+
 make grade：
+
 ![屏幕截图 2024-10-13 143235](https://github.com/user-attachments/assets/c9b8fe39-b338-4db9-8a91-dd9266b53fbc)
 
 ###阐述代码是如何对物理内存进行分配和释放
