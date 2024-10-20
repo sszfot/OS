@@ -1,4 +1,4 @@
-#lab 2
+# lab 2
 本次的实验主要是在实验一的基础上完成物理内存管理，并建立一个最简单的页表映射。
 ##知识点
 本实验中重要的知识点：
@@ -7,8 +7,6 @@
 连续内存分配要求每个进程的地址空间必须是连续的物理内存。操作系统将物理内存划分为一个个连续的区域，每个进程从中获得一段连续的内存区域来执行代码和存储数据。随着进程的频繁加载和卸载，内存中的空闲块变得不连续，产生外部碎片。尽管内存空闲总量可能很大，但分散的小块空闲区域可能不足以满足大进程的需求。分页内存分配是现代操作系统中使用的内存分配方式，它将物理内存和进程的虚拟内存空间都划分为固定大小的块。进程的虚拟地址空间不再要求是连续的物理地址空间，而是通过页表实现虚拟地址到物理地址的映射。
 内存回收：内存回收是指在程序不再需要某些内存时，将其释放回系统，以便其他程序或任务可以使用。
 碎片处理：碎片化是指内存分配和回收过程中，系统的空闲内存被分割成多个不连续的小块，导致较大的内存请求无法得到满足。内部碎片是由于分配的内存块大于实际需要的内存造成的浪费。外部碎片是指虽然有足够的空闲内存，但由于空闲块是不连续的，无法满足较大的内存分配请求。伙伴系统将内存按照 2 的幂次分成块，当一个块被释放时，如果与其相邻的块也是空闲的，可以合并成更大的块。通过实现伙伴系统可以用于进行碎片处理。
-
-OS原理中很重要，但在实验中没有对应上的知识点：
 
 ##练习1：理解first-fit 连续物理内存分配算法
 kern/mm/default_pmm.c中的相关代码，认真分析default_init，default_init_memmap，default_alloc_pages， default_free_pages等相关函数
@@ -68,20 +66,108 @@ make grade：
 
 ###阐述代码是如何对物理内存进行分配和释放
 ####分配
+best_fit_alloc_pages 函数设计思路：该函数用于根据请求的页数 n，在空闲内存块链表 free_list 中找到最合适的内存块（即大小刚好满足或比需求略大的内存块），并进行内存分配。
+
 检查：首先，函数检查当前系统中的空闲页数 nr_free 是否大于或等于请求的页数 n。如果空闲页数不足，直接返回 NULL，表示分配失败。
+        assert(n > 0);
+    if (n > nr_free) {
+        return NULL;
+    }
+使用 assert 保证请求的页数 n 大于 0。
+检查请求的页数是否大于当前空闲页数 nr_free，如果请求的页数超过了空闲页数，直接返回 NULL 表示无法分配。
 
-查找：从 free_list 链表的头开始遍历，查找能够满足请求大小的所有块。它记录找到的最小的满足条件的块（即 p->property >= n 且最小的块）。
+查找：从 free_list 链表的头开始遍历，查找能够满足请求大小的所有块。它记录找到的最小的满足条件的块（即 p->property >= n 且最小的块）。使用 best_page 记录当前找到的最佳适配块，并更新 best_size 为当前最小的块大小。
+    struct Page *best_page = NULL;
+    list_entry_t *le = &free_list;
+    size_t best_size = nr_free + 1;
+    
+    while ((le = list_next(le)) != &free_list) {
+        struct Page *p = le2page(le, page_link);
+        if (p->property >= n && p->property < best_size) {
+            best_page = p;
+            best_size = p->property;
+        }
+    }
 
-分配：如果块的大小正好等于请求的大小，则直接分配整个块。如果块的大小大于请求的大小，则将剩余的部分拆分出来，并将剩余部分重新插入空闲链表。
+
+分配：如果块的大小正好等于请求的大小，则直接分配整个块。如果块的大小大于请求的大小，则将剩余的部分拆分出来，并将剩余部分重新插入空闲链表。从链表中删除最佳块并分割多余部分。如果找到了合适的块（best_page != NULL），从链表中删除该块。如果找到的块比请求的 n 页更大，则需要将多余的部分（best_page + n 后的页）作为新的空闲块重新插入到链表中，并更新其属性值。
+    if (best_page != NULL) {
+        list_entry_t* prev = list_prev(&(best_page->page_link));
+        list_del(&(best_page->page_link));
+    
+        if (best_page->property > n) {
+            struct Page* p = best_page + n;
+            p->property = best_page->property - n;
+            SetPageProperty(p);
+            list_add(prev, &(p->page_link));
+        }
+    
+        nr_free -= n;
+        ClearPageProperty(best_page);
+    }
+
 
 更新：减少全局空闲页数 nr_free，清除已分配块的 PG_property 标志，最后返回分配的内存块的起始地址。
+
 ####释放
+best_fit_free_pages 函数设计思路：释放已分配的内存，将其重新插入到空闲链表中，并尝试合并相邻的空闲内存块。
+检查并重置页的属性：
+首先检查释放的页是否有效，确保它们没有被标记为保留或已分配的属性。将这些页的标志位和引用计数重置。设置释放的页块属性为 n（表示该块包含 n 页），并更新全局空闲页数 nr_free。
+    assert(n > 0);
+    struct Page *p = base;
+    for (; p != base + n; p++) {
+        assert(!PageReserved(p) && !PageProperty(p));
+        p->flags = 0;
+        set_page_ref(p, 0);
+    }
+    base->property = n;
+    SetPageProperty(base);
+    nr_free += n;
+如果空闲链表为空，则直接将当前释放的块加入链表（list_add(&free_list, &(base->page_link));）；如果非空，遍历链表找到合适的位置，将释放的块按照地址顺序插入链表，确保空闲块按照地址顺序排列。
+    list_entry_t* le = &free_list;
+        while ((le = list_next(le)) != &free_list) {
+            struct Page* page = le2page(le, page_link);
+            if (base < page) {
+                list_add_before(le, &(base->page_link));
+                break;
+            } else if (list_next(le) == &free_list) {
+                list_add(le, &(base->page_link));
+            }
+
+合并相邻的内存块：分为与前一个和与后一个。前者：检查前一个块是否与当前释放的块相邻，如果是，则合并这两个块，更新前一个块的大小，并将当前块从链表中删除。
+    list_entry_t* le = list_prev(&(base->page_link));
+    if (le != &free_list) {
+        p = le2page(le, page_link);
+        if (p + p->property == base) {
+            p->property += base->property;
+            ClearPageProperty(base);
+            list_del(&(base->page_link));
+            base = p;
+        }
+    }
+
+后者：检查后一个块是否与当前释放的块相邻，如果是，则合并它们，更新当前块的大小，并将后一个块从链表中删除。
+    le = list_next(&(base->page_link));
+    if (le != &free_list) {
+        p = le2page(le, page_link);
+        if (base + base->property == p) {
+            base->property += p->property;
+            ClearPageProperty(p);
+            list_del(&(p->page_link));
+        }
+    }
+
 
 ###你的 Best-Fit 算法是否有进一步的改进空间？
+1.Best-Fit 需要遍历整个空闲块链表，查找最小的可用内存块。在链表较大时，这会带来性能问题，尤其是在频繁分配和释放内存时，每次都需要全遍历链表。可以使用伙伴系统来进行管理，或者使用平衡树结构代替链表。
 
+2.虽然 Best-Fit 在找到最合适的块时减少了内存碎片，但仍然可能会产生大量的小碎片，尤其是在频繁的分配和释放操作中。可以采用定期执行碎片整理或者设计一种自适应算法的方式进行改进。
+
+3.Best-Fit 在分配内存时严格选择最小的满足条件的块，有时可能会导致更大的空闲块被不合理地切割，留下的碎片很难被再次利用。可以引入次优选择策略，例如在空闲块中选择与请求大小差距在一定范围内的块，从而避免完全依赖 Best-Fit 策略造成的碎片化。
 
 ##扩展练习Challenge：buddy system（伙伴系统）分配算法（需要编程）
 参考伙伴分配器的一个极简实现， 在ucore中实现buddy system分配算法，要求有比较充分的测试用例说明实现的正确性，需要有设计文档。
+请见测试文档以及代码。
 
 ##扩展练习Challenge：任意大小的内存单元slub分配算法（需要编程）
 slub算法，实现两层架构的高效内存单元分配，第一层是基于页大小的内存分配，第二层是在第一层基础上实现基于任意大小的内存分配。可简化实现，能够体现其主体思想即可。
