@@ -381,11 +381,12 @@ struct Page *lru_swap_out(struct mm_struct *mm, int *swap_in) {
 #### 执行效果
 
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-27-08-b73d6af60a552e96b770c3e346e51de.png)
+![图片](https://github.com/user-attachments/assets/6221f8ec-00c7-4da1-84bf-59888a1bede3)
 
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-27-01-ddd6fe2324865936dca9b90bdfdb482.png)
-
+![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-27-01-ddd6fe2324865936dca9b90bdfdb482.png)
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-26-54-130ce6133b12079ee988794a2fb2a51.png)
-
+![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-26-54-130ce6133b12079ee988794a2fb2a51.png)
 
 
 ## 总结
