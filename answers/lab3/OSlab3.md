@@ -155,12 +155,8 @@ do_pgfault(struct mm_struct *mm, uint_t error_code, uintptr_t addr) {
            if (swap_init_ok) {
                struct Page *page = NULL;
 
-           // 尝试从交换空间加载页面到物理内存，失败则直接跳转
                if ((ret = swap_in(mm, addr, &page)) == 0) {
-           // 成功加载后，建立物理页与虚拟地址映射
                 page_insert(mm->pgdir, page, addr, perm);
-
-           // 设置页面为可交换，并更新页面地址
                 swap_map_swappable(mm, addr, page, 1);
                 page->pra_vaddr = addr;
               } else {
