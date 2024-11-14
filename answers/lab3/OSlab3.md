@@ -387,7 +387,7 @@ struct Page *lru_swap_out(struct mm_struct *mm, int *swap_in) {
 
 #### 执行效果
 
-clock算法实现：
+
 
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-27-08-b73d6af60a552e96b770c3e346e51de.png)
 
@@ -401,9 +401,7 @@ clock算法实现：
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-26-54-130ce6133b12079ee988794a2fb2a51.png)
 <img width="476" alt="1731497658121" src="https://github.com/user-attachments/assets/1509b0b0-d7f3-4267-be86-2240411de8c2">
 
-LRU暂无可行的输出结果验证
 
-![屏幕截图 2024-11-14 155135](https://github.com/user-attachments/assets/6afbbcb6-85bc-4d81-adf1-a08c2ed9fa9a)
 
 
 
