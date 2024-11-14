@@ -51,6 +51,10 @@ setup_page_table() -> 使用新映射更新页表。
 
 从分配开始：
 
+find_vma()-寻址，判断产生异常的地址是否存在对应的vma
+
+get_pte()-查询页表项，没有则创建一个新的
+
 alloc_page() - 分配一个新的物理页面，如果没有可用页面，则可能触发页面置换。
 
 到换出：
@@ -61,8 +65,15 @@ swap_out() - 将选定的旧页面从物理内存中移除，并可能将其数�
 
 setup_page_table() - 更新页表，以映射新页面到虚拟地址空间中，同时撤销旧页面的映射。
 
+free_page -将换出的页表清空
+
 到换入：
+
 swap_in() - 将新页面从磁盘（如果之前被换出）加载到内存中，确保数据可用性。
+
+page_insert() -建立物理页与虚拟地址的映射
+
+swap_map_swappable -设置页面为可交换
 
 ## 练习2：深入理解不同分页模式的工作原理（思考题）
 
@@ -376,6 +387,8 @@ struct Page *lru_swap_out(struct mm_struct *mm, int *swap_in) {
 
 #### 执行效果
 
+clock算法实现：
+
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-27-08-b73d6af60a552e96b770c3e346e51de.png)
 
 <img width="479" alt="1731497613508" src="https://github.com/user-attachments/assets/f08cdd7b-db4a-4d5f-bde0-fd6fb6c4d061">
@@ -387,6 +400,11 @@ struct Page *lru_swap_out(struct mm_struct *mm, int *swap_in) {
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-26-54-130ce6133b12079ee988794a2fb2a51.png)
 ![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-10-31-13-26-54-130ce6133b12079ee988794a2fb2a51.png)
 <img width="476" alt="1731497658121" src="https://github.com/user-attachments/assets/1509b0b0-d7f3-4267-be86-2240411de8c2">
+
+LRU暂无可行的输出结果验证
+
+![屏幕截图 2024-11-14 155135](https://github.com/user-attachments/assets/6afbbcb6-85bc-4d81-adf1-a08c2ed9fa9a)
+
 
 
 ## 总结
