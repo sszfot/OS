@@ -20,6 +20,32 @@
 
 ## 重要知识点
 
+## 练习0：填写已有实验
+
+补充vmm.c中的do_pgfualt，实验代码与Lab3一致
+
+```
+if (swap_init_ok) {
+            struct Page *page = NULL;
+            // 你要编写的内容在这里，请基于上文说明以及下文的英文注释完成代码编写
+            //(1）According to the mm AND addr, try
+            //to load the content of right disk page
+            //into the memory which page managed.
+            //(2) According to the mm,
+            //addr AND page, setup the
+            //map of phy addr <--->
+            //logical addr
+            //(3) make the page swappable.
+            swap_in(mm,addr,&page);
+            page_insert(mm->pgdir,page,addr,perm);
+            swap_map_swappable(mm,addr,page,1);
+            page->pra_vaddr = addr;
+        } else {
+            cprintf("no swap_init_ok but ptep is %x, failed\n", *ptep);
+            goto failed;
+        }
+```
+
 ## 练习1：分配并初始化一个进程控制块（需要编码）
 
 alloc_proc函数（位于kern/process/proc.c中）负责分配并返回一个新的struct proc_struct结构，用于存储新建立的内核线程的管理信息。ucore需要对这个结构进行最基本的初始化，你需要完成这个初始化过程。（在alloc_proc函数的实现中，需要初始化的proc_struct结构中的成员变量至少包括：state/pid/runs/kstack/need_resched/parent/mm/context/tf/cr3/flags/name。）
