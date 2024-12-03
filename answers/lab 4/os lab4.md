@@ -410,6 +410,8 @@ proc_run(struct proc_struct *proc) {
    
    - 将 `SIE` 位清零，禁用中断。
 
+local_intr_save函数调用__intr_save函数，__intr_save函数使用read_csr(sstatus) 读取RISC-V 的 sstatus 寄存器值，read_csr宏将读取的值（保存在 __tmp 中）作为返回值返回，如果SSTATUS_SIE（表示中断是否使能的标志位）为 1，通过调用 intr_disable() 关闭中断，intr_disable函数调用clear_csr(sstatus, SSTATUS_SIE);通过将 SSTATUS_SIE 位清零来关闭中断。
+
 ### **2. `local_intr_restore(intr_flag)` 的作用和实现**
 
 #### **作用**
@@ -427,6 +429,8 @@ proc_run(struct proc_struct *proc) {
    
    - 将 `intr_flag` 的值写回处理器的状态寄存器。
    - 在 RISC-V 中，通过设置 `SIE` 位来恢复中断。
+
+local_intr_restore函数调用__intr_restore函数，__intr_restore函数根据flag是否为真来决定是否调用intr_enable函数，intr_enable函数使用set_csr(sstatus, SSTATUS_SIE); 将 SSTATUS_SIE 置 1 来开启中断
 
 ### **3. 流程**
 
