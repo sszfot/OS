@@ -191,6 +191,8 @@ proc->tf = (struct trapframe *)(proc->kstack + KSTACKSIZE - sizeof(struct trapfr
 
 **`wakeup_proc`**：将新进程状态设置为可运行。
 
+代码实现：
+
 ```
     proc = alloc_proc();
     if (proc == NULL) {
