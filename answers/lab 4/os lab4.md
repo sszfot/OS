@@ -112,8 +112,8 @@ sp：设置为 proc->tf 的地址，表示新的栈顶。
 **struct trapframe *tf**：
 
 - `trapframe` 是一个结构体，保存了处理器在陷入中断或异常时的寄存器状态。
-- 它包括通用寄存器的值、程序计数器 `pc`、栈指针 `sp` 等。
-- 它用于处理器从用户态或内核态陷入中断时保存处理器状态，以及在异常处理完成后恢复状态。
+- 它包括寄存器的值，程序计数器 epc，异常相关信息badvaddr、cause等，处理器状态status
+- 它用于处理器从用户态或内核态陷入中断时保存处理器状态，以及在异常处理完成后恢复状态。在异常、中断或系统调用发生时，CPU会将信息保存到 trapframe 中。
 
 ###### 在本实验中的作用
 
@@ -190,6 +190,40 @@ proc->tf = (struct trapframe *)(proc->kstack + KSTACKSIZE - sizeof(struct trapfr
 **`hash_proc`** 和 **`list_add`**：将新进程添加到调度器的管理结构中。
 
 **`wakeup_proc`**：将新进程状态设置为可运行。
+
+```
+    proc = alloc_proc();
+    if (proc == NULL) {
+        goto fork_out;
+    }
+
+    //为进程分配一个内核栈
+    if (setup_kstack(proc) != 0) {
+        goto bad_fork_cleanup_proc;
+    }
+
+    //复制内存管理信息
+    if (copy_mm(clone_flags, proc) != 0) {
+        goto bad_fork_cleanup_kstack;
+    }
+
+    //复制上下文和 trapframe 到新进程
+    copy_thread(proc, stack, tf);
+
+    //分配唯一 PID
+    proc->pid = get_pid();
+
+    //将新进程添加到进程哈希表和全局进程列表
+    hash_proc(proc);
+    list_add(&proc_list, &(proc->list_link));
+
+    //唤醒新进程并设置其为 RUNNABLE
+    wakeup_proc(proc);
+
+    //返回新进程的 PID
+    ret = proc->pid;
+    goto fork_out;
+```
 
 ### 请说明ucore是否做到给每个新fork的线程一个唯一的id？请说明你的分析和理由。
 
