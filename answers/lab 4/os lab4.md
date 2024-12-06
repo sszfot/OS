@@ -312,10 +312,11 @@ proc_run(struct proc_struct *proc) {
   - 创建完成后，其 `state` 被设置为 `PROC_RUNNABLE`。
 
 ## 对以上三个练习运行后的结果截图
+<img width="474" alt="49db26e986388b9ddd4264bd5bc6a50" src="https://github.com/user-attachments/assets/cdb22149-9c62-4d86-9900-e75d932dcbc2">
 
-![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-12-06-15-30-17-49db26e986388b9ddd4264bd5bc6a50.png)
+<img width="269" alt="bb6f89194a4c936bff77e50d0a62caf" src="https://github.com/user-attachments/assets/00df2b1f-24b4-44ca-8698-84f4ef696e78">
 
-![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-12-06-15-30-25-bb6f89194a4c936bff77e50d0a62caf.png)
+
 
 ## 扩展练习 Challenge
 
