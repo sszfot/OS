@@ -372,6 +372,8 @@ proc_run(struct proc_struct *proc) {
 
 <img width="269" alt="bb6f89194a4c936bff77e50d0a62caf" src="https://github.com/user-attachments/assets/00df2b1f-24b4-44ca-8698-84f4ef696e78">
 
+![屏幕截图 2024-12-06 154837](https://github.com/user-attachments/assets/550668e4-beb5-4602-8943-c31d73e3ce8d)
+
 
 
 ## 扩展练习 Challenge
