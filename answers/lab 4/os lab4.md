@@ -20,32 +20,6 @@
 
 ## 重要知识点
 
-## 练习0：填写已有实验
-
-补充vmm.c中的do_pgfualt，实验代码与Lab3一致
-
-```
-if (swap_init_ok) {
-            struct Page *page = NULL;
-            // 你要编写的内容在这里，请基于上文说明以及下文的英文注释完成代码编写
-            //(1）According to the mm AND addr, try
-            //to load the content of right disk page
-            //into the memory which page managed.
-            //(2) According to the mm,
-            //addr AND page, setup the
-            //map of phy addr <--->
-            //logical addr
-            //(3) make the page swappable.
-            swap_in(mm,addr,&page);
-            page_insert(mm->pgdir,page,addr,perm);
-            swap_map_swappable(mm,addr,page,1);
-            page->pra_vaddr = addr;
-        } else {
-            cprintf("no swap_init_ok but ptep is %x, failed\n", *ptep);
-            goto failed;
-        }
-```
-
 ## 练习1：分配并初始化一个进程控制块（需要编码）
 
 alloc_proc函数（位于kern/process/proc.c中）负责分配并返回一个新的struct proc_struct结构，用于存储新建立的内核线程的管理信息。ucore需要对这个结构进行最基本的初始化，你需要完成这个初始化过程。（在alloc_proc函数的实现中，需要初始化的proc_struct结构中的成员变量至少包括：state/pid/runs/kstack/need_resched/parent/mm/context/tf/cr3/flags/name。）
@@ -90,9 +64,8 @@ parent 和 mm 字段：初始值为 NULL，这些会在稍后设置。
 ### 请说明proc_struct中struct context context和struct trapframe *tf成员变量含义和在本实验中的作用是啥？（提示通过看代码和编程调试可以判断出来）
 
 **struct context context**：
-context 是一个用于保存进程上下文信息的数据结构，主要用于 进程切换 时保存或恢复 CPU 的状态,包括返回地址 (ra)、栈指针 (sp)、以及其他通用寄存器（s0-s11）
-，这些信息在一个进程被调度器切换出去，或是从中断返回用户态时，需要保存当前进程的寄存器状态，避免状态丢失。当该进程被重新调度运行时，调度器会使用 switch_to 
-函数加载 context 中保存的寄存器值，从而恢复进程的运行状态。
+context 是一个用于保存进程上下文信息的数据结构，主要用于 进程切换 时保存或恢复 CPU 的状态。
+它包括寄存器内容（如栈指针 sp 和返回地址 ra），这些信息在进程从当前任务切换到另一个任务时需要保存，以便稍后可以恢复。
 
 ###### 在本实验中的作用
 
@@ -112,8 +85,8 @@ sp：设置为 proc->tf 的地址，表示新的栈顶。
 **struct trapframe *tf**：
 
 - `trapframe` 是一个结构体，保存了处理器在陷入中断或异常时的寄存器状态。
-- 它包括寄存器的值，程序计数器 epc，异常相关信息badvaddr、cause等，处理器状态status
-- 它用于处理器从用户态或内核态陷入中断时保存处理器状态，以及在异常处理完成后恢复状态。在异常、中断或系统调用发生时，CPU会将信息保存到 trapframe 中。
+- 它包括通用寄存器的值、程序计数器 `pc`、栈指针 `sp` 等。
+- 它用于处理器从用户态或内核态陷入中断时保存处理器状态，以及在异常处理完成后恢复状态。
 
 ###### 在本实验中的作用
 
@@ -190,42 +163,6 @@ proc->tf = (struct trapframe *)(proc->kstack + KSTACKSIZE - sizeof(struct trapfr
 **`hash_proc`** 和 **`list_add`**：将新进程添加到调度器的管理结构中。
 
 **`wakeup_proc`**：将新进程状态设置为可运行。
-
-代码实现：
-
-```
-    proc = alloc_proc();
-    if (proc == NULL) {
-        goto fork_out;
-    }
-
-    //为进程分配一个内核栈
-    if (setup_kstack(proc) != 0) {
-        goto bad_fork_cleanup_proc;
-    }
-
-    //复制内存管理信息
-    if (copy_mm(clone_flags, proc) != 0) {
-        goto bad_fork_cleanup_kstack;
-    }
-
-    //复制上下文和 trapframe 到新进程
-    copy_thread(proc, stack, tf);
-
-    //分配唯一 PID
-    proc->pid = get_pid();
-
-    //将新进程添加到进程哈希表和全局进程列表
-    hash_proc(proc);
-    list_add(&proc_list, &(proc->list_link));
-
-    //唤醒新进程并设置其为 RUNNABLE
-    wakeup_proc(proc);
-
-    //返回新进程的 PID
-    ret = proc->pid;
-    goto fork_out;
-```
 
 ### 请说明ucore是否做到给每个新fork的线程一个唯一的id？请说明你的分析和理由。
 
@@ -376,9 +313,9 @@ proc_run(struct proc_struct *proc) {
 
 ## 对以上三个练习运行后的结果截图
 
-![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-11-24-10-33-00-44a90c5b73747daca91d14bed30ac87.png)
+![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-12-06-15-30-17-49db26e986388b9ddd4264bd5bc6a50.png)
 
-![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-11-24-10-33-09-bdf9dc914dbcbba76756c9a476a2b66.png)
+![](C:\Users\lenovo\AppData\Roaming\marktext\images\2024-12-06-15-30-25-bb6f89194a4c936bff77e50d0a62caf.png)
 
 ## 扩展练习 Challenge
 
@@ -410,8 +347,6 @@ proc_run(struct proc_struct *proc) {
    
    - 将 `SIE` 位清零，禁用中断。
 
-local_intr_save函数调用__intr_save函数，__intr_save函数使用read_csr(sstatus) 读取RISC-V 的 sstatus 寄存器值，read_csr宏将读取的值（保存在 __tmp 中）作为返回值返回，如果SSTATUS_SIE（表示中断是否使能的标志位）为 1，通过调用 intr_disable() 关闭中断，intr_disable函数调用clear_csr(sstatus, SSTATUS_SIE);通过将 SSTATUS_SIE 位清零来关闭中断。
-
 ### **2. `local_intr_restore(intr_flag)` 的作用和实现**
 
 #### **作用**
@@ -430,8 +365,6 @@ local_intr_save函数调用__intr_save函数，__intr_save函数使用read_csr(s
    - 将 `intr_flag` 的值写回处理器的状态寄存器。
    - 在 RISC-V 中，通过设置 `SIE` 位来恢复中断。
 
-local_intr_restore函数调用__intr_restore函数，__intr_restore函数根据flag是否为真来决定是否调用intr_enable函数，intr_enable函数使用set_csr(sstatus, SSTATUS_SIE); 将 SSTATUS_SIE 置 1 来开启中断
-
 ### **3. 流程**
 
 1. **保存并禁用中断**：
@@ -444,7 +377,7 @@ local_intr_save(intr_flag);
 
     2.**执行关键代码**：
 
-- 此时中断被禁用，当前代码不会被打断。在此过程中实现了进程的切换，CR3寄存器的修改，上下文的切换。
+- 此时中断被禁用，当前代码不会被打断。
 
     3.**恢复中断**：
 
