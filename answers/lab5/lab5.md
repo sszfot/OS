@@ -113,6 +113,11 @@ memcpy(dst, src, PGSIZE);
 ret = page_insert(to, npage, start, perm);
 ```
 
+### 实验结果
+![屏幕截图 2024-12-15 143611](https://github.com/user-attachments/assets/b03b7b6e-8428-43d7-ad18-ee4b498ee339)
+![屏幕截图 2024-12-15 143554](https://github.com/user-attachments/assets/0eed3310-5434-4e56-bb29-ac7d11f909b9)
+
+
 
 ## 练习三：阅读分析源代码，理解进程执行 fork/exec/wait/exit 的实现，以及系统调用的实现
 
